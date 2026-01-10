@@ -1,0 +1,954 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Second Chance: Ruins of Destiny</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: 'Georgia', serif; 
+            overflow: hidden; 
+            background: #000;
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            touch-action: none;
+        }
+
+        #game-container { 
+            position: relative; 
+            width: 100vw; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+
+        #bg-layer { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-size: cover; 
+            background-position: center center; 
+            background-repeat: no-repeat;
+            transition: opacity 0.8s ease;
+        }
+        
+        /* Otimização para fundos em mobile */
+        @media (max-width: 768px) {
+            #bg-layer {
+                background-size: cover;
+                background-position: center 30%;
+            }
+        }
+
+        #char-layer { 
+            position: absolute; 
+            bottom: 0; 
+            left: 0;
+            right: 0;
+            width: 100%; 
+            height: 70vh; 
+            display: flex; 
+            align-items: flex-end; 
+            justify-content: center; 
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        #char-layer img { 
+            height: 100%;
+            width: auto;
+            max-width: none;
+            object-fit: cover;
+            object-position: center bottom;
+            opacity: 0; 
+            transition: opacity 0.5s ease;
+        }
+        
+        /* Ajuste para personagens que ficam muito largos */
+        @media (max-width: 480px) {
+            #char-layer img {
+                width: 100%;
+                height: auto;
+                max-height: 70vh;
+                object-fit: contain;
+            }
+        }
+
+        #char-layer img.show { opacity: 1; }
+
+        /* === TELA DE LOGIN MOBILE === */
+        #login-screen { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-image: url('assets/bg/fundo menu.jpg'); 
+            background-size: cover; 
+            background-position: center;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        #login-screen::before { 
+            content: ''; 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            background: radial-gradient(circle at top, rgba(230,199,122,0.3), rgba(90,70,50,0.5));
+            animation: particles 8s infinite;
+        }
+
+        @keyframes particles { 
+            0%, 100% { opacity: 0.3; } 
+            50% { opacity: 0.6; } 
+        }
+
+        .login-box { 
+            background: rgba(250,246,238,0.95); 
+            border: 3px solid #E6C77A; 
+            border-radius: 20px; 
+            padding: 30px 25px; 
+            box-shadow: 0 10px 40px rgba(230,199,122,0.5);
+            text-align: center; 
+            position: relative; 
+            z-index: 2;
+            width: 85%;
+            max-width: 400px;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: scale(0.9); } 
+            to { opacity: 1; transform: scale(1); } 
+        }
+
+        .login-box h1 { 
+            font-size: 28px; 
+            color: #5A4632; 
+            margin-bottom: 10px; 
+            text-shadow: 2px 2px 4px rgba(230,199,122,0.3);
+            line-height: 1.2;
+        }
+
+        .login-box p { 
+            font-size: 14px; 
+            color: #8B7355; 
+            margin-bottom: 20px; 
+        }
+
+        .login-box input { 
+            width: 100%; 
+            padding: 12px 15px; 
+            font-size: 16px; 
+            border: 2px solid #E6C77A; 
+            border-radius: 12px; 
+            background: #FAF6EE; 
+            color: #5A4632; 
+            margin-bottom: 20px;
+        }
+
+        .login-box input:focus { 
+            outline: none; 
+            border-color: #D4AF37; 
+            box-shadow: 0 0 15px rgba(230,199,122,0.5);
+        }
+
+        .start-btn { 
+            width: 100%; 
+            padding: 14px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #5A4632; 
+            background: linear-gradient(135deg, #F3E5B5, #E6C77A); 
+            border: 2px solid #E6C77A; 
+            border-radius: 12px; 
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .start-btn:active { 
+            transform: scale(0.97); 
+            box-shadow: 0 8px 20px rgba(230,199,122,0.6);
+        }
+
+        /* === CAIXA DE TEXTO MOBILE === */
+        #ui-box { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: rgba(250,246,238,0.98); 
+            border-top: 3px solid #E6C77A;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 20px 25px 20px;
+            box-shadow: 0 -8px 30px rgba(0,0,0,0.4);
+            display: none;
+            max-height: 35vh;
+            overflow: hidden;
+            z-index: 100;
+        }
+
+        #name-tag { 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #5A4632; 
+            margin-bottom: 10px; 
+            text-shadow: 1px 1px 2px rgba(230,199,122,0.4);
+        }
+
+        #text-content { 
+            font-size: 15px; 
+            line-height: 1.6; 
+            color: #5A4632; 
+            margin-bottom: 15px;
+            max-height: 18vh;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        /* Melhor legibilidade em telas pequenas */
+        @media (max-height: 700px) {
+            #text-content {
+                font-size: 14px;
+                line-height: 1.5;
+                max-height: 15vh;
+            }
+        }
+
+        #next-btn { 
+            float: right; 
+            padding: 10px 20px; 
+            font-size: 15px; 
+            color: #5A4632; 
+            background: linear-gradient(135deg, #F3E5B5, #E6C77A); 
+            border: 2px solid #E6C77A; 
+            border-radius: 10px; 
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        #next-btn:active { 
+            transform: scale(0.95);
+        }
+
+        /* === ESCOLHAS MOBILE === */
+        #choices-overlay { 
+            position: fixed; 
+            bottom: 15px; 
+            left: 5%;
+            right: 5%;
+            width: 90%;
+            display: none; 
+            flex-direction: column; 
+            gap: 12px;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-bottom: 10px;
+            z-index: 200;
+        }
+
+        .choice-btn { 
+            background: rgba(250,246,238,0.98); 
+            border: 3px solid #E6C77A; 
+            border-radius: 15px; 
+            padding: 18px 20px; 
+            font-size: 16px; 
+            line-height: 1.4;
+            color: #5A4632; 
+            cursor: pointer; 
+            text-align: center;
+            touch-action: manipulation;
+            box-shadow: 0 4px 15px rgba(230,199,122,0.3);
+            transition: all 0.2s ease;
+        }
+
+        .choice-btn:active { 
+            background: linear-gradient(135deg, #F3E5B5, #E6C77A);
+            transform: scale(0.98);
+        }
+
+        .choice-btn.premium {
+            border-color: #D4AF37;
+            background: linear-gradient(135deg, rgba(243,229,181,0.97), rgba(230,199,122,0.97));
+        }
+
+        .choice-btn.premium::before {
+            content: '💎 ';
+        }
+
+        /* Scrollbar customizada */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(230,199,122,0.2); }
+        ::-webkit-scrollbar-thumb { background: #E6C77A; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <audio id="audio-engine" loop></audio>
+
+    <div id="game-container">
+        <div id="bg-layer"></div>
+        <div id="char-layer"></div>
+        
+        <div id="ui-box">
+            <div id="name-tag"></div>
+            <div id="text-content"></div>
+            <button id="next-btn" onclick="next()">Próximo ▶</button>
+        </div>
+        
+        <div id="choices-overlay"></div>
+    </div>
+
+    <div id="login-screen">
+        <div class="login-box">
+            <h1>✨ Second Chance ✨</h1>
+            <p>Ruins of Destiny</p>
+            <input type="text" id="player-name" placeholder="Digite seu nome..." maxlength="20">
+            <button class="start-btn" onclick="startGame()">Começar Aventura</button>
+        </div>
+    </div>
+    
+
+    <script>
+        let step = "prologo_1";
+        let nomeJogadora = "Protagonista";
+        const audioEngine = document.getElementById('audio-engine');
+        audioEngine.volume = 0.4;
+
+        const gameData = {
+            // === PRÓLOGO ===
+            "prologo_1": { 
+                bg: "o escritório", 
+                audio: "escritório", 
+                name: "[NOME]", 
+                text: "(Pensamento) Outro dia de relatórios, prazos e vozes que nunca parecem me ouvir. Sinto como se estivesse apenas flutuando pela vida, sem rumo.", 
+                next: "prologo_2" 
+            },
+            "prologo_2": { 
+                bg: "o escritório", 
+                audio: "escritório", 
+                name: "[NOME]", 
+                text: "(Olho para o relógio digital que marca 18:00) 'Finalmente 18h... que dia cansativo. Estou exausta. Acho que vou apenas para casa e tentar esquecer que amanhã tudo recomeça.'", 
+                next: "prologo_acidente" 
+            },
+            "prologo_acidente": { 
+                bg: "Noite", 
+                audio: "o acidente",
+                impacto: true,
+                name: "Sistema", 
+                text: "(SFX: Pneus derrapando, som de batida de carro e vidro se estilhaçando) 'O que...? Tudo ficou escuro... Não sinto o chão... não sinto nada.'", 
+                next: "prologo_vazio" 
+            },
+            "prologo_vazio": { 
+                bg: "O Vazio", 
+                audio: "menu", 
+                name: "Voz de Aleia", 
+                text: "'Sua chama ainda não se apagou totalmente, alma perdida. O destino cometeu um erro... ou talvez, tenha criado uma oportunidade.'", 
+                next: "prologo_vazio_2" 
+            },
+            "prologo_vazio_2": { 
+                bg: "O Vazio", 
+                audio: "menu",
+                name: "[NOME]", 
+                text: "'Quem é você? Eu estou... morta?'", 
+                next: "prologo_vazio_3"
+            },
+            "prologo_vazio_3": { 
+                bg: "O Vazio",
+                name: "Voz de Aleia", 
+                text: "'Você está no limiar. Mas eu vejo em você um desejo de mudança que nunca foi atendido. [NOME], esta é sua segunda chance. Use-a bem.'", 
+                next: "prologo_despertar"
+            },
+            "prologo_despertar": {
+                bg: "Ruinas",
+                audio: "mystical japanese",
+                name: "[NOME]",
+                text: "(Acordo na grama macia, respirando fundo) 'Onde... onde eu estou? O cheiro de poluição sumiu... o ar é tão puro que chega a doer.'",
+                next: "prologo_escolha"
+            },
+            "prologo_escolha": {
+                bg: "anoitecendo",
+                name: "[NOME]",
+                text: "(Vejo quatro caminhos diferentes à minha frente) 'Aquela voz disse segunda chance... Se for verdade, eu não vou desperdiçá-la. É hora de descobrir quem eu realmente sou.'",
+                next: "bifurcacao"
+            },
+
+            // === BIFURCAÇÃO ===
+            "bifurcacao": {
+                bg: "a escolha", 
+                audio: "mystical japanese",
+                name: "Sistema", 
+                text: "Quatro caminhos se abrem diante de você. Qual deles chama sua alma?", 
+                choices: [
+                    { text: "🌸 Seguir o Rio", next: "desc_kaiden" },
+                    { text: "🌙 Descansar na Árvore", next: "desc_lucien" },
+                    { text: "⚔️ Voltar para as Ruínas", next: "desc_aelion" },
+                    { text: "☀️ Seguir pela Floresta", next: "desc_eryon" }
+                ]
+            },
+
+            // === DESCRIÇÕES DAS ROTAS ===
+            "desc_kaiden": {
+                bg: "O Caminho do Templo",
+                audio: "mystical japanese", 
+                name: "[NOME]",
+                text: "(Pensamento) Que lugar estranho... parece abandonado, mas sinto como se mil olhos estivessem me vigiando entre as árvores.",
+                choices: [
+                    { text: "Seguir o rio", next: "k_1" }, 
+                    { text: "Voltar", next: "bifurcacao" }
+                ]
+            },
+            "desc_lucien": {
+                bg: "A arvore",
+                audio: "gótica do lucien", 
+                name: "[NOME]",
+                text: "(Pensamento) Que frio... Minha cabeça ainda dói. Onde eu estou? Isso não parece mais a floresta de onde eu saí...",
+                choices: [
+                    { text: "Explorar a árvore", next: "l_1" }, 
+                    { text: "Voltar", next: "bifurcacao" }
+                ]
+            },
+            "desc_aelion": {
+                bg: "Ruinas",
+                audio: "trilha do aelion", 
+                name: "[NOME]",
+                text: "(Pensamento) Que lugar majestoso... mas parece tão solitário. É como se a própria tristeza estivesse impregnada nessas paredes.",
+                choices: [
+                    { text: "Entrar nas ruínas", next: "a_1" }, 
+                    { text: "Voltar", next: "bifurcacao" }
+                ]
+            },
+            "desc_eryon": {
+                bg: "O Esconderijo",
+                audio: "passos na floresta", 
+                name: "[NOME]",
+                text: "(Pensamento) Que sensação é essa? Sinto como se meu corpo estivesse ficando leve... o medo simplesmente desapareceu aqui.",
+                choices: [
+                    { text: "Seguir pela floresta", next: "e_1" }, 
+                    { text: "Voltar", next: "bifurcacao" }
+                ]
+            },
+
+            // === ROTA KAIDEN ===
+            "k_1": { 
+                bg: "O Templo Abandonado", 
+                char: "Kaiden preocupado (roupa verde)", 
+                audio: "mystical japanese", 
+                name: "Kaiden", 
+                text: "Espere! Não dê mais nenhum passo! Quem é você e como conseguiu atravessar a barreira de névoa? Este templo não recebe visitas humanas há mais de um século.",
+                choices: [
+                    { text: "Pode me ajudar?", next: "k_ajuda" },
+                    { text: "Quem é você?", next: "k_quem" },
+                    { text: "💎 Você parece solitário...", next: "k_premium", premium: true }
+                ]
+            },
+            "k_ajuda": {
+                char: "Kaiden preocupado (roupa verde)",
+                name: "Kaiden",
+                text: "Tsc. Vocês humanos são todos iguais... sempre pedindo antes de oferecer algo. Mas... você está sangrando no joelho. Venha, entre antes que os demônios da floresta sintam o cheiro.",
+                next: "k_historia"
+            },
+            "k_quem": {
+                char: "Kaiden preocupado (roupa verde)",
+                name: "Kaiden",
+                text: "Eu sou o guardião deste lugar. E o seu pior pesadelo se não sair daqui agora. Mas, vendo o seu estado... duvido que consiga andar dois metros sem tropeçar de novo.",
+                next: "k_historia"
+            },
+            "k_premium": {
+                char: "Kaiden triste e chorando (roupa verde)",
+                name: "Kaiden",
+                text: "(Ele congela, surpreso) 'O quê? Solitário? Não diga asneiras, humana. Eu tenho o silêncio e as estrelas.'",
+                next: "k_premium_2"
+            },
+            "k_premium_2": {
+                bg: "O Templo",
+                char: "Kaiden triste e chorando (roupa verde)",
+                name: "Kaiden",
+                text: "'A verdade é que... eu não falo com ninguém há séculos. Este selo me mantém aqui, enquanto o resto do meu mundo seguiu em frente. Falar com você... é como ouvir uma música que eu já tinha esquecido.'",
+                next: "k_historia"
+            },
+            "k_historia": { 
+                bg: "dentro do templo", 
+                char: "Kaiden triste e chorando (roupa verde)", 
+                name: "Kaiden", 
+                text: "Você pergunta por que estou sozinho? (Ele desvia o olhar) Fui amaldiçoado por deuses antigos a proteger este rio sagrado. Se eu sair, minha alma simplesmente desaparece no vazio.", 
+                next: "k_parceria" 
+            },
+            "k_parceria": { 
+                bg: "O Templo", 
+                char: "Kaiden segurando a rosa em mostrando a calda (roupa vermelha)", 
+                name: "Kaiden", 
+                text: "Você diz que não tem medo da minha maldição? Que criatura peculiar você é, [NOME]. As flores do templo estão morrendo. Se você insiste em ficar, talvez possamos cuidar deste lugar... juntos.", 
+                next: "k_perigo" 
+            },
+            "k_perigo": { 
+                bg: "noite e chuva", 
+                char: "Kaiden preocupado (roupa verde)", 
+                name: "Kaiden", 
+                text: "CUIDADO! O rio sentiu sua energia vital e as sombras do esquecimento estão se revoltando! (Ele desembainha uma lâmina espiritual) Fique atrás de mim, [NOME]!", 
+                next: "k_romance" 
+            },
+            "k_romance": { 
+                bg: "O Templo", 
+                char: "Kaiden segurando a rosa e sorrindo (roupa vermelha)", 
+                name: "Kaiden", 
+                text: "Obrigado por não ter fugido... (Ele te estende uma rosa vermelha brilhante) Esta flor nasceu da minha magia. Enquanto ela brilhar, significa que meu coração bate por você.", 
+                next: "k_paixao" 
+            },
+            "k_paixao": { 
+                bg: "O Templo", 
+                char: "Kaiden com o kimono aberto mostrando o abs tentando me beijar", 
+                name: "Kaiden", 
+                text: "[NOME]... a eternidade que eu tanto odiava agora parece curta demais se for para passá-la ao seu lado. Eu não quero passar mais nenhuma noite sem sentir o seu calor perto de mim.", 
+                next: "k_final" 
+            },
+            "k_final": { 
+                bg: "O Templo", 
+                char: "Kaiden oferecendo a mão (roupa preta)", 
+                name: "Kaiden", 
+                text: "O destino me deu uma segunda chance ao trazer você até aqui. [NOME], você aceitaria unir sua alma à minha e governar este templo como minha esposa?", 
+                choices: [
+                    { text: "💍 Aceitar o Casamento", next: "k_casamento" },
+                    { text: "Ficar como Parceira", next: "k_sozinha" }
+                ]
+            },
+            "k_casamento": { 
+                bg: "O Templo", 
+                char: "Kaiden segurando a aliança casamento", 
+                name: "Kaiden", 
+                text: "Com este anel, eu quebro o ciclo da solidão. Eu te prometo, [NOME], que nem o tempo, nem a morte e nem o esquecimento poderão nos separar. Você é minha eternidade.", 
+                next: "fim" 
+            },
+            "k_sozinha": { 
+                bg: "O Templo", 
+                char: "Kaiden preocupado (roupa verde)",
+                name: "Kaiden", 
+                text: "Eu entendo... sua liberdade é preciosa. Mesmo que não nos unamos formalmente, o fato de você estar aqui, ao meu lado, já é o maior milagre que recebi em séculos.", 
+                next: "fim" 
+            },
+
+            // === ROTA LUCIEN ===
+            "l_1": { 
+                bg: "entrando no portao do castelo", 
+                audio: "gótica do lucien", 
+                char: "Lucien como o lord vampiro", 
+                name: "Lucien", 
+                text: "Humanos raramente sobrevivem a este castelo... O que te faz pensar que serás diferente, pequena mortal? O teu sangue canta para mim.", 
+                choices: [
+                    { text: "Não tenho medo de ti", next: "l_coragem" },
+                    { text: "Estou apenas perdida", next: "l_perdida" },
+                    { text: "💎 Seus olhos são lindos", next: "l_premium", premium: true }
+                ]
+            },
+            "l_coragem": { 
+                char: "Lucien como o lord vampiro",
+                name: "Lucien", 
+                text: "Audaz... Gosto disso. Talvez a tua alma seja tão vibrante quanto o teu sangue.", 
+                next: "l_historia" 
+            },
+            "l_perdida": { 
+                char: "Lucien como o lord vampiro",
+                name: "Lucien", 
+                text: "Pois agora foste encontrada pelo destino. Rezas para que ele seja gentil contigo.", 
+                next: "l_historia" 
+            },
+            "l_premium": {
+                bg: "Dentro do castelo sombrio",
+                char: "Lucien sorrindo sarcastico",
+                name: "Lucien",
+                text: "(Surpreso) 'Lindos? Você vê a cor do sangue e chama de beleza? Você é louca ou está tentando me seduzir para sobreviver?'",
+                next: "l_premium_2"
+            },
+            "l_premium_2": {
+                char: "Lucien sorrindo feliz",
+                name: "Lucien",
+                text: "(Ele te envolve em sua capa) 'Eu deveria drenar cada gota desse seu elogio... Mas há algo em você que me dá vontade de... protegê-la do mundo lá fora.'",
+                next: "l_historia"
+            },
+            "l_historia": { 
+                bg: "Dentro do castelo sombrio", 
+                char: "Lucien triste e chorando", 
+                name: "Lucien", 
+                text: "(Lágrimas de sangue escorrem pelo rosto) A imortalidade é apenas uma solidão que nunca termina. Vi impérios caírem, mas nada dói tanto quanto o silêncio destes séculos.", 
+                next: "l_parceria" 
+            },
+            "l_parceria": { 
+                bg: "Dentro do castelo sombrio", 
+                char: "Lucien encarando de lado falando", 
+                name: "Lucien", 
+                text: "Tu tens coragem, [NOME]. Há algo em ti... uma luz que desafia a minha escuridão. É fascinante. Queres ajudar-me a redescobrir o que é ser vivo?", 
+                choices: [
+                    { text: "Ficarei ao teu lado", next: "l_sim" },
+                    { text: "Se não me morder", next: "l_brincadeira" }
+                ]
+            },
+            "l_sim": { 
+                char: "Lucien sorrindo feliz",
+                name: "Lucien", 
+                text: "Então o pacto está selado. O castelo agora também te pertence.", 
+                next: "l_perigo" 
+            },
+            "l_brincadeira": { 
+                char: "Lucien sorrindo sarcastico",
+                name: "Lucien", 
+                text: "(Ele dá um sorriso sombrio) Farei o meu melhor para me controlar...", 
+                next: "l_perigo" 
+            },
+            "l_perigo": { 
+                bg: "noite e chuva", 
+                char: "Lucien encarando olhar preocupado", 
+                name: "Lucien", 
+                text: "Cuidado! Os caçadores voltaram por mim... Mas eles cometeram um erro fatal ao ameaçar-te. Não deixarei que te toquem, nem que eu tenha de queimar o mundo!", 
+                next: "l_romance" 
+            },
+            "l_romance": { 
+                bg: "A torre mais alta", 
+                char: "Lucien sorrindo feliz", 
+                name: "Lucien", 
+                text: "(Ele observa o luar ao teu lado) A noite é eterna, mas contigo... ela tornou-se doce. Nunca pensei que voltaria a apreciar a beleza da lua.", 
+                next: "l_paixao" 
+            },
+            "l_paixao": { 
+                bg: "Dentro do castelo sombrio", 
+                char: "Lucien sem camisa proximo tentando me beijar", 
+                name: "Lucien", 
+                text: "[NOME]... sentes o meu coração? Ele bate apenas por ti agora. Sou teu, corpo e alma, se me aceitares.", 
+                choices: [
+                    { text: "💋 Beijar Lucien", next: "l_final" },
+                    { text: "Abraçá-lo", next: "l_final" }
+                ]
+            },
+            "l_final": { 
+                bg: "O Castelo das Sombras", 
+                char: "Lucien sorrindo feliz", 
+                name: "Lucien", 
+                text: "O sol nunca mais brilhará da mesma forma sem ti. Queres ser a minha rainha da noite e governar a eternidade ao meu lado?", 
+                choices: [
+                    { text: "💍 Casar com Lucien", next: "l_casamento" },
+                    { text: "Seguir sozinha", next: "fim" }
+                ]
+            },
+            "l_casamento": { 
+                bg: "A torre mais alta", 
+                char: "Lucien colocando a aliança em minha mão", 
+                name: "Lucien", 
+                text: "Com este anel, prendo a minha vida à tua. A eternidade agora tem um propósito real: amar-te.", 
+                next: "fim" 
+            },
+
+            // === ROTA AELION ===
+            "a_1": { 
+                bg: "Ruinas", 
+                audio: "trilha do aelion", 
+                char: "Aelion como rei dos elfos", 
+                name: "Aelion", 
+                text: "O que uma humana busca num reino em cinzas? Estas pedras guardam memórias que a tua raça já esqueceu há muito tempo.", 
+                choices: [
+                    { text: "Procuro a verdade", next: "a_verdade" },
+                    { text: "Admirei a beleza", next: "a_beleza" },
+                    { text: "💎 Deixe-me ajudar a restaurar", next: "a_premium", premium: true }
+                ]
+            },
+            "a_verdade": { 
+                char: "Aelion como rei dos elfos",
+                name: "Aelion", 
+                text: "A verdade é um fardo pesado. Estás pronta para carregá-lo?", 
+                next: "a_historia" 
+            },
+            "a_beleza": { 
+                char: "Aelion como rei dos elfos",
+                name: "Aelion", 
+                text: "Beleza... Há séculos que ninguém via nada além de ruínas aqui.", 
+                next: "a_historia" 
+            },
+            "a_premium": {
+                bg: "Ruinas do trono 1",
+                char: "Aelion segurando o lirio olhar distante",
+                name: "Aelion",
+                text: "(Ele segura seu pulso com firmeza) 'Não toque nisso! Runas de contenção podem ser fatais para quem não possui sangue nobre.'",
+                next: "a_premium_2"
+            },
+            "a_premium_2": {
+                char: "Aelion olhando para traz (roupa branca)",
+                name: "Aelion",
+                text: "'Você... não foi repelida? Estranho. Se realmente quer ajudar, observe. Esta runa significa Eternidade. É assim que a verdadeira história é escrita.'",
+                next: "a_historia"
+            },
+            "a_historia": { 
+                bg: "Ruinas do trono 1", 
+                char: "Aelion segurando o lirio olhar distante", 
+                name: "Aelion", 
+                text: "O meu povo partiu para as Terras Imortais, e eu fiquei para trás com o meu orgulho e o meu dever. Sou o rei de um povo que não existe mais.", 
+                next: "a_parceria" 
+            },
+            "a_parceria": { 
+                bg: "Ruinas do trono 2", 
+                char: "Aelion olhando para traz (roupa branca)", 
+                name: "Aelion", 
+                text: "Olha... as flores estão a voltar a brotar entre as fendas do mármore. É a tua presença, [NOME]? Tu trazes vida a tudo o que tocas.", 
+                next: "a_perigo" 
+            },
+            "a_perigo": { 
+                bg: "O Esconderijo", 
+                char: "Aelion olhando de lado (roupa preta)", 
+                name: "Aelion", 
+                text: "O Vazio está a consumir as últimas runas de proteção! Fica atrás de mim, [NOME]! Se este for o meu fim, morrerei protegendo a última coisa bela que restou neste mundo!", 
+                next: "a_romance" 
+            },
+            "a_romance": { 
+                bg: "A arvore", 
+                char: "Aelion sorrindo (roupa preta)", 
+                name: "Aelion", 
+                text: "Sobrevivemos... (Ele sorri, uma expressão rara e pura) Nunca pensei que voltaria a sorrir assim. A tua luz é mais forte que a magia dos meus ancestrais.", 
+                next: "a_paixao" 
+            },
+            "a_paixao": { 
+                bg: "Ruinas do trono 1", 
+                char: "Aelion tentando me beijar levemente corado", 
+                name: "Aelion", 
+                text: "O meu reino pode estar em ruínas, mas o meu coração está a ser reconstruído por ti. Deixa-me provar o teu amor, [NOME].", 
+                choices: [
+                    { text: "💋 Entregar-se ao beijo", next: "a_final" },
+                    { text: "Dizer que o amas", next: "a_final" }
+                ]
+            },
+            "a_final": { 
+                bg: "A arvore", 
+                char: "Aelion sorrindo oferecendo a mão", 
+                name: "Aelion", 
+                text: "Não quero mais ser o rei das cinzas. Quero construir um novo mundo contigo. Governas estas terras ao meu lado?", 
+                choices: [
+                    { text: "💍 Casar com Aelion", next: "a_casamento" },
+                    { text: "Seguir sozinha", next: "fim" }
+                ]
+            },
+            "a_casamento": { 
+                bg: "A arvore", 
+                char: "Aelion corpo inteiro casamento", 
+                name: "Aelion", 
+                text: "O nosso reino renasce hoje sob a luz das estrelas. Seremos eternos nos contos que ainda virão.", 
+                next: "fim" 
+            },
+
+            // === ROTA ERYON ===
+            "e_1": { 
+                bg: "O Esconderijo", 
+                audio: "passos na floresta", 
+                char: "Eryon Deus da Luz", 
+                name: "Eryon", 
+                text: "Esperava por ti, pequena estrela. O tecido do tempo me avisou que uma alma vibrante cruzaria o véu esta noite.", 
+                choices: [
+                    { text: "Por que me esperava?", next: "e_esperava" },
+                    { text: "Onde estou?", next: "e_onde" },
+                    { text: "💎 Você parece um anjo", next: "e_premium", premium: true }
+                ]
+            },
+            "e_esperava": { 
+                char: "Eryon Deus da Luz",
+                name: "Eryon", 
+                text: "Porque você é a peça que faltava neste mundo em declínio. Sua luz é pura, algo que eu não via há eras.", 
+                next: "e_historia" 
+            },
+            "e_onde": { 
+                char: "Eryon Deus da Luz",
+                name: "Eryon", 
+                text: "Você está no Santuário do Lago Lunar. Um lugar entre o que foi e o que será. Aqui, as feridas da alma podem começar a fechar.", 
+                next: "e_historia" 
+            },
+            "e_premium": {
+                bg: "eryon_1",
+                char: "Eryon envergonhado corado",
+                name: "Eryon",
+                text: "(Ele cora levemente) 'Um anjo? Sou apenas um mensageiro do que resta da luz. Mas... suas palavras aquecem minha essência.'",
+                next: "e_premium_2"
+            },
+            "e_premium_2": {
+                bg: "eryon_2",
+                char: "Eryon serio oferecendo a mão",
+                name: "Eryon",
+                text: "(Ele coloca as mãos sobre seus ombros) 'Você se machucou na queda... Deixe-me cuidar disso.' (Uma luz dourada te envolve e toda a dor desaparece)",
+                next: "e_historia"
+            },
+            "e_historia": { 
+                bg: "eryon_1", 
+                char: "Eryon triste e preocupado", 
+                name: "Eryon", 
+                text: "Ser um Deus é observar tudo, mas não tocar em nada. A luz é vasta, mas sem ninguém para partilhar o calor, ela é apenas um vazio brilhante e cego.", 
+                next: "e_parceria" 
+            },
+            "e_parceria": { 
+                bg: "eryon_2", 
+                char: "Eryon serio oferecendo a mão", 
+                name: "Eryon", 
+                text: "Vem comigo, [NOME]. Deixa-me mostrar-te os segredos da criação através dos teus olhos mortais. Quero ver o mundo como tu o vês.", 
+                next: "e_perigo" 
+            },
+            "e_perigo": { 
+                bg: "eryon_3", 
+                char: "Eryon serio", 
+                name: "Eryon", 
+                text: "A escuridão primordial tenta apagar a tua luz porque tens o que os deuses invejam: um coração puro. Não permitirei que te levem de mim!", 
+                next: "e_romance" 
+            },
+            "e_romance": { 
+                bg: "A arvore", 
+                char: "Eryon segurando a flor olhar distrante", 
+                name: "Eryon", 
+                text: "A batalha terminou, mas a minha admiração por ti só cresce. A tua alma brilha mais do que qualquer sol que eu já tenha criado.", 
+                next: "e_paixao" 
+            },
+            "e_paixao": { 
+                bg: "O Esconderijo", 
+                char: "Eryon corado tentando me beijar", 
+                name: "Eryon", 
+                text: "Sinto que posso desistir da minha divindade apenas para sentir o teu toque por um minuto. Amo-te para além do tempo e do espaço.", 
+                choices: [
+                    { text: "💋 Aceitar o amor de um Deus", next: "e_final" },
+                    { text: "Prometer nunca o deixar", next: "e_final" }
+                ]
+            },
+            "e_final": { 
+                bg: "A arvore", 
+                char: "Eryon sorrindo com a mão de tras da cabeça", 
+                name: "Eryon", 
+                text: "O céu pode esperar. Quero viver aqui, agora, contigo. Ficas comigo para toda a eternidade?", 
+                choices: [
+                    { text: "💍 Casar com Eryon", next: "e_casamento" },
+                    { text: "Seguir sozinha", next: "fim" }
+                ]
+            },
+            "e_casamento": { 
+                bg: "A arvore", 
+                char: "Eryon sorrindo casamento", 
+                name: "Eryon", 
+                text: "Agora és a minha luz, o meu sol e a minha lua. O universo inteiro celebra o nosso amor hoje.", 
+                next: "fim" 
+            },
+            
+            "fim": { 
+                bg: "fundo menu", 
+                name: "Sistema", 
+                text: "Obrigado por jogar Second Chance: Ruins of Destiny! ❤️✨", 
+                next: "restart" 
+            }
+        };
+
+        function transitionAudio(trackName, extension = "mp4", forceImpact = false) {
+            const newSrc = `assets/audio/${trackName}.${extension}`;
+            if (audioEngine.src.includes(newSrc)) return;
+
+            if (forceImpact) {
+                audioEngine.pause();
+                audioEngine.src = newSrc;
+                audioEngine.loop = false;
+                audioEngine.volume = 1.0;
+                audioEngine.play().catch(e => console.log("Erro áudio impacto"));
+                return;
+            }
+
+            let fadeOut = setInterval(() => {
+                if (audioEngine.volume > 0.05) {
+                    audioEngine.volume -= 0.05;
+                } else {
+                    clearInterval(fadeOut);
+                    audioEngine.pause();
+                    audioEngine.src = newSrc;
+                    audioEngine.loop = true;
+                    audioEngine.play().then(() => {
+                        let fadeIn = setInterval(() => {
+                            if (audioEngine.volume < 0.4) {
+                                audioEngine.volume += 0.05;
+                            } else {
+                                clearInterval(fadeIn);
+                            }
+                        }, 50);
+                    }).catch(e => console.log("Áudio bloqueado"));
+                }
+            }, 30);
+        }
+
+        function render() {
+            if (step === "restart") { location.reload(); return; }
+            const data = gameData[step];
+            if (!data) return;
+
+            document.getElementById('bg-layer').style.backgroundImage = `url('assets/bg/${data.bg}.jpg')`;
+            
+            const charLayer = document.getElementById('char-layer');
+            if (data.char) {
+                charLayer.style.opacity = "0";
+                setTimeout(() => {
+                    charLayer.innerHTML = `<img src="assets/chars/${data.char}.png" class="show">`;
+                    charLayer.style.opacity = "1";
+                }, 300);
+            } else {
+                charLayer.innerHTML = "";
+            }
+
+            if (data.audio) {
+                const isMenu = data.audio === "menu";
+                transitionAudio(data.audio, isMenu ? "mpeg" : "mp4", data.impacto || false);
+            }
+
+            const choicesOverlay = document.getElementById('choices-overlay');
+            const uiBox = document.getElementById('ui-box');
+
+            if (data.choices) {
+                uiBox.style.display = 'none';
+                choicesOverlay.style.display = 'flex';
+                choicesOverlay.innerHTML = "";
+                data.choices.forEach(c => {
+                    const b = document.createElement('div');
+                    b.className = 'choice-btn';
+                    if (c.premium) b.classList.add('premium');
+                    b.innerText = c.text;
+                    b.onclick = () => { 
+                        step = c.next; 
+                        choicesOverlay.style.display = 'none'; 
+                        render(); 
+                    };
+                    choicesOverlay.appendChild(b);
+                });
+            } else {
+                uiBox.style.display = 'block';
+                choicesOverlay.style.display = 'none';
+                document.getElementById('name-tag').innerText = data.name.replace("[NOME]", nomeJogadora);
+                document.getElementById('text-content').innerText = data.text.replace("[NOME]", nomeJogadora);
+            }
+        }
+
+        function startGame() {
+            const input = document.getElementById('player-name').value;
+            if (input.trim() !== "") nomeJogadora = input;
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('ui-box').style.display = 'block';
+            render();
+        }
+
+        function next() {
+            const data = gameData[step];
+            if (data && data.next && !data.choices) {
+                step = data.next;
+                render();
+            }
+        }
+
+        // Prevenir scroll indesejado no mobile
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.closest('#text-content') || e.target.closest('#choices-overlay')) {
+                return;
+            }
+            e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
