@@ -51,6 +51,13 @@
         transition: opacity 0.8s ease;
     }
     
+    #bg {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    
     /* Anotação: Otimização para fundos em mobile */
     @media (max-width: 768px) {
         #bg-layer {
@@ -62,7 +69,7 @@
     /* ╔════════════════════════════════════════════════════════════════╗ */
     /* ║                   CAMADA DO PERSONAGEM (SPRITE)                ║ */
     /* ╚════════════════════════════════════════════════════════════════╝ */
-    #char-layer { 
+    #sprite-layer { 
         position: absolute; 
         bottom: 0; 
         left: 0;
@@ -76,9 +83,9 @@
         overflow: hidden;
     }
 
-    #char-layer img { 
+    #charImg { 
         height: 100%;
-        width: auto;
+        width: 100%;
         max-width: none;
         object-fit: cover;
         object-position: center bottom;
@@ -88,7 +95,7 @@
     
     /* Anotação: Ajuste para personagens que ficam muito largos */
     @media (max-width: 480px) {
-        #char-layer img {
+        #charImg {
             width: 100%;
             height: auto;
             max-height: 70vh;
@@ -96,7 +103,7 @@
         }
     }
 
-    #char-layer img.show { 
+    #charImg.show { 
         opacity: 1; 
     }
 
@@ -241,7 +248,6 @@
         border-top-right-radius: 20px;
         padding: 20px 20px 25px 20px;
         box-shadow: 0 -8px 30px rgba(0,0,0,0.4);
-        display: none;
         max-height: 35vh;
         overflow: hidden;
         z-index: 100;
@@ -282,8 +288,17 @@
         }
     }
 
+    .speaker-container {
+        display: none;
+    }
+
+    .text-container {
+        margin: 0;
+        padding: 0;
+    }
+
     /* ╔════════════════════════════════════════════════════════════════╗ */
-    /* ║                    BOTÃO PRÓXIMO                               ║ */
+    /* ║                    INDICADOR PRÓXIMO                           ║ */
     /* ╚════════════════════════════════════════════════════════════════╝ */
     .next-indicator { 
         float: right; 
@@ -389,6 +404,40 @@
 
     #toast.show {
         opacity: 1;
+    }
+
+    /* ╔════════════════════════════════════════════════════════════════╗ */
+    /* ║                    BOTÕES DE CONTROLE                          ║ */
+    /* ╚════════════════════════════════════════════════════════════════╝ */
+    .game-controls {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        gap: 8px;
+        z-index: 100;
+    }
+
+    .game-controls.hidden {
+        display: none;
+    }
+
+    .control-btn {
+        background: rgba(250,246,238,0.95);
+        border: 2px solid #E6C77A;
+        color: #5A4632;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        transition: all 0.2s ease;
+        touch-action: manipulation;
+    }
+
+    .control-btn:active {
+        background: linear-gradient(135deg, #F3E5B5, #E6C77A);
+        transform: scale(0.97);
     }
 
     /* ╔════════════════════════════════════════════════════════════════╗ */
