@@ -4,458 +4,428 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Second Chance - Ruins of Destiny</title>
-<style>
-    /* ╔════════════════════════════════════════════════════════════════╗ */
-    /* ║                    RESET E ESTILOS GLOBAIS                     ║ */
-    /* ╚════════════════════════════════════════════════════════════════╝ */
-    * { 
-        margin: 0; 
-        padding: 0; 
-        box-sizing: border-box; 
-        -webkit-tap-highlight-color: transparent;
-    }
-    
-    body { 
-        font-family: 'Georgia', serif; 
-        overflow: hidden; 
-        background: #000;
-        position: fixed;
-        width: 100%;
-        height: 100vh;
-        touch-action: none;
-        color: #5A4632;
-    }
-
-    /* ╔════════════════════════════════════════════════════════════════╗ */
-    /* ║                     CONTAINER PRINCIPAL                        ║ */
-    /* ╚════════════════════════════════════════════════════════════════╝ */
-    #game-container { 
-        position: relative; 
-        width: 100vw; 
-        height: 100vh; 
-        overflow: hidden; 
-    }
-
-    /* ╔════════════════════════════════════════════════════════════════╗ */
-    /* ║                      CAMADA DE FUNDO                           ║ */
-    /* ╚════════════════════════════════════════════════════════════════╝ */
-    #bg-layer { 
-        position: absolute; 
-        top: 0; 
-        left: 0; 
-        width: 100%; 
-        height: 100%; 
-        background-size: cover; 
-        background-position: center center; 
-        background-repeat: no-repeat;
-        transition: opacity 0.8s ease;
-    }
-    
-    #bg {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
-    
-    /* Anotação: Otimização para fundos em mobile */
-    @media (max-width: 768px) {
-        #bg-layer {
-            background-size: cover;
-            background-position: center 30%;
+    <style>
+        /* ╔════════════════════════════════════════════════════════════════╗ */
+        /* ║                    RESET E ESTILOS GLOBAIS                     ║ */
+        /* ╚════════════════════════════════════════════════════════════════╝ */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
         }
-    }
-
-    /* ╔════════════════════════════════════════════════════════════════╗ */
-    /* ║                   CAMADA DO PERSONAGEM (SPRITE)                ║ */
-    /* ╚════════════════════════════════════════════════════════════════╝ */
-    #sprite-layer { 
-        position: absolute; 
-        bottom: 0; 
-        left: 0;
-        right: 0;
-        width: 100%; 
-        height: 70vh; 
-        display: flex; 
-        align-items: flex-end; 
-        justify-content: center; 
-        pointer-events: none;
-        overflow: hidden;
-    }
-
-    #charImg { 
-        height: 100%;
-        width: 100%;
-        max-width: none;
-        object-fit: cover;
-        object-position: center bottom;
-        opacity: 0; 
-        transition: opacity 0.5s ease;
-    }
-    
-    /* Anotação: Ajuste para personagens que ficam muito largos */
-    @media (max-width: 480px) {
-        #charImg {
+        
+        body { 
+            font-family: 'Georgia', serif; 
+            overflow: hidden; 
+            background: #000;
+            position: fixed;
             width: 100%;
-            height: auto;
-            max-height: 70vh;
-            object-fit: contain;
+            height: 100vh;
+            touch-action: none;
+            color: #5A4632;
         }
-    }
 
-    #charImg.show { 
-        opacity: 1; 
-    }
+        /* ╔════════════════════════════════════════════════════════════════╗ */
+        /* ║                     CONTAINER PRINCIPAL                        ║ */
+        /* ╚════════════════════════════════════════════════════════════════╝ */
+        #game-container { 
+            position: relative; 
+            width: 100vw; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
 
-    /* ╔════════════════════════════════════════════════════════════════╗ */
-    /* ║                    TELA DE LOGIN/MENU INICIAL                  ║ */
-    /* ╚════════════════════════════════════════════════════════════════╝ */
-    #main-menu { 
-        position: fixed; 
-        top: 0; 
-        left: 0; 
-        width: 100%; 
-        height: 100%; 
-        background-image: url('assets/chars/login.png'); 
-        background-size: cover; 
-        background-position: center;
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        z-index: 1000;
-        overflow: hidden;
-    }
+        /* ╔════════════════════════════════════════════════════════════════╗ */
+        /* ║                      CAMADA DE FUNDO                           ║ */
+        /* ╚════════════════════════════════════════════════════════════════╝ */
+        #bg-layer { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-size: cover; 
+            background-position: center center; 
+            background-repeat: no-repeat;
+            transition: opacity 0.8s ease;
+        }
+        
+        #bg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            #bg-layer {
+                background-size: cover;
+                background-position: center 30%;
+            }
+        }
 
-    /* Anotação: Gradiente radial para efeito vinheta */
-    #main-menu::before { 
-        content: ''; 
-        position: absolute; 
-        width: 100%; 
-        height: 100%; 
-        background: radial-gradient(circle at top, rgba(230,199,122,0.3), rgba(90,70,50,0.5));
-        animation: particles 8s infinite;
-    }
+        /* ╔════════════════════════════════════════════════════════════════╗ */
+        /* ║                   CAMADA DO PERSONAGEM (SPRITE)                ║ */
+        /* ╚════════════════════════════════════════════════════════════════╝ */
+        #sprite-layer { 
+            position: absolute; 
+            bottom: 0; 
+            left: 0;
+            right: 0;
+            width: 100%; 
+            height: 70vh; 
+            display: flex; 
+            align-items: flex-end; 
+            justify-content: center; 
+            pointer-events: none;
+            overflow: hidden;
+        }
 
-    @keyframes particles { 
-        0%, 100% { opacity: 0.3; } 
-        50% { opacity: 0.6; } 
-    }
+        #charImg { 
+            height: 100%;
+            width: 100%;
+            max-width: none;
+            object-fit: cover;
+            object-position: center bottom;
+            opacity: 0; 
+            transition: opacity 0.5s ease;
+        }
+        
+        @media (max-width: 480px) {
+            #charImg {
+                width: 100%;
+                height: auto;
+                max-height: 70vh;
+                object-fit: contain;
+            }
+        }
 
-    #main-menu.hidden {
-        display: none;
-    }
+        /* ╔════════════════════════════════════════════════════════════════╗ */
+        /* ║                    TELA DE LOGIN/MENU INICIAL                  ║ */
+        /* ╚════════════════════════════════════════════════════════════════╝ */
+        #main-menu { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-image: url('assets/chars/login.png'); 
+            background-size: cover; 
+            background-position: center;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1000;
+            overflow: hidden;
+        }
 
-    /* ╔════════════════════════════════════════════════════════════════╗ */
-    /* ║                      CONTEÚDO DO MENU                          ║ */
-    /* ╚════════════════════════════════════════════════════════════════╝ */
-    .menu-content { 
-        background: rgba(250,246,238,0.95); 
-        border: 3px solid #E6C77A; 
-        border-radius: 20px; 
-        padding: 30px 25px; 
-        box-shadow: 0 10px 40px rgba(230,199,122,0.5);
-        text-align: center; 
-        position: relative; 
-        z-index: 2;
-        width: 85%;
-        max-width: 400px;
-        animation: fadeIn 1s ease;
-    }
+        #main-menu::before { 
+            content: ''; 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            background: radial-gradient(circle at top, rgba(230,199,122,0.3), rgba(90,70,50,0.5));
+            animation: particles 8s infinite;
+        }
 
-    @keyframes fadeIn { 
-        from { opacity: 0; transform: scale(0.9); } 
-        to { opacity: 1; transform: scale(1); } 
-    }
+        @keyframes particles { 
+            0%, 100% { opacity: 0.3; } 
+            50% { opacity: 0.6; } 
+        }
 
-    /* Anotação: Título principal */
-    .game-title { 
-        font-size: 28px; 
-        color: #5A4632; 
-        margin-bottom: 10px; 
-        text-shadow: 2px 2px 4px rgba(230,199,122,0.3);
-        line-height: 1.2;
-    }
+        #main-menu.hidden {
+            display: none;
+        }
 
-    /* Anotação: Subtítulo */
-    .subtitle { 
-        font-size: 14px; 
-        color: #8B7355; 
-        margin-bottom: 20px; 
-    }
+        .menu-content { 
+            background: rgba(250,246,238,0.95); 
+            border: 3px solid #E6C77A; 
+            border-radius: 20px; 
+            padding: 30px 25px; 
+            box-shadow: 0 10px 40px rgba(230,199,122,0.5);
+            text-align: center; 
+            position: relative; 
+            z-index: 2;
+            width: 85%;
+            max-width: 400px;
+            animation: fadeIn 1s ease;
+        }
 
-    /* Anotação: Campo de entrada do nome */
-    #playerName { 
-        width: 100%; 
-        padding: 12px 15px; 
-        font-size: 16px; 
-        border: 2px solid #E6C77A; 
-        border-radius: 12px; 
-        background: #FAF6EE; 
-        color: #5A4632; 
-        margin-bottom: 20px;
-        font-family: 'Georgia', serif;
-    }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: scale(0.9); } 
+            to { opacity: 1; transform: scale(1); } 
+        }
 
-    #playerName:focus { 
-        outline: none; 
-        border-color: #D4AF37; 
-        box-shadow: 0 0 15px rgba(230,199,122,0.5);
-    }
+        .game-title { 
+            font-size: 28px; 
+            color: #5A4632; 
+            margin-bottom: 10px; 
+            text-shadow: 2px 2px 4px rgba(230,199,122,0.3);
+            line-height: 1.2;
+        }
 
-    #playerName::placeholder {
-        color: rgba(90,70,50,0.5);
-    }
+        .subtitle { 
+            font-size: 14px; 
+            color: #8B7355; 
+            margin-bottom: 20px; 
+        }
 
-    /* Anotação: Botão iniciar jogo */
-    #startBtn { 
-        width: 100%; 
-        padding: 14px; 
-        font-size: 18px; 
-        font-weight: bold; 
-        color: #5A4632; 
-        background: linear-gradient(135deg, #F3E5B5, #E6C77A); 
-        border: 2px solid #E6C77A; 
-        border-radius: 12px; 
-        cursor: pointer;
-        touch-action: manipulation;
-        transition: all 0.2s ease;
-    }
+        #playerName { 
+            width: 100%; 
+            padding: 12px 15px; 
+            font-size: 16px; 
+            border: 2px solid #E6C77A; 
+            border-radius: 12px; 
+            background: #FAF6EE; 
+            color: #5A4632; 
+            margin-bottom: 20px;
+            font-family: 'Georgia', serif;
+        }
 
-    #startBtn:active { 
-        transform: scale(0.97); 
-        box-shadow: 0 8px 20px rgba(230,199,122,0.6);
-    }
+        #playerName:focus { 
+            outline: none; 
+            border-color: #D4AF37; 
+            box-shadow: 0 0 15px rgba(230,199,122,0.5);
+        }
 
-    .menu-footer {
-        margin-top: 15px;
-        font-size: 12px;
-        color: #8B7355;
-        font-style: italic;
-    }
+        #playerName::placeholder {
+            color: rgba(90,70,50,0.5);
+        }
 
-    /* ╔════════════════════════════════════════════════════════════════╗ */
-    /* ║                    CAIXA DE DIÁLOGO (TEXTBOX)                  ║ */
-    /* ╚════════════════════════════════════════════════════════════════╝ */
-    #textbox { 
-        position: fixed; 
-        bottom: 0; 
-        left: 0;
-        right: 0;
-        width: 100%;
-        background: rgba(250,246,238,0.98); 
-        border-top: 3px solid #E6C77A;
-        border-top-left-radius: 20px;
-        border-top-right-radius: 20px;
-        padding: 20px 20px 25px 20px;
-        box-shadow: 0 -8px 30px rgba(0,0,0,0.4);
-        max-height: 35vh;
-        overflow: hidden;
-        z-index: 100;
-    }
+        #startBtn { 
+            width: 100%; 
+            padding: 14px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #5A4632; 
+            background: linear-gradient(135deg, #F3E5B5, #E6C77A); 
+            border: 2px solid #E6C77A; 
+            border-radius: 12px; 
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: all 0.2s ease;
+        }
 
-    #textbox.hidden {
-        display: none;
-    }
+        #startBtn:active { 
+            transform: scale(0.97); 
+            box-shadow: 0 8px 20px rgba(230,199,122,0.6);
+        }
 
-    /* Anotação: Nome do personagem que está falando */
-    #speaker { 
-        font-size: 18px; 
-        font-weight: bold; 
-        color: #5A4632; 
-        margin-bottom: 10px; 
-        text-shadow: 1px 1px 2px rgba(230,199,122,0.4);
-    }
+        .menu-footer {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #8B7355;
+            font-style: italic;
+        }
 
-    /* Anotação: Conteúdo do diálogo */
-    #text { 
-        font-size: 15px; 
-        line-height: 1.6; 
-        color: #5A4632; 
-        margin-bottom: 15px;
-        max-height: 18vh;
-        overflow-y: auto;
-        padding-right: 5px;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-    }
-    
-    /* Anotação: Melhor legibilidade em telas pequenas */
-    @media (max-height: 700px) {
-        #text {
+        /* ╔════════════════════════════════════════════════════════════════╗ */
+        /* ║                    CAIXA DE DIÁLOGO (TEXTBOX)                  ║ */
+        /* ╚════════════════════════════════════════════════════════════════╝ */
+        #textbox { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: rgba(250,246,238,0.98); 
+            border-top: 3px solid #E6C77A;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 20px 25px 20px;
+            box-shadow: 0 -8px 30px rgba(0,0,0,0.4);
+            max-height: 35vh;
+            overflow: hidden;
+            z-index: 100;
+        }
+
+        #textbox.hidden {
+            display: none;
+        }
+
+        #speaker { 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #5A4632; 
+            margin-bottom: 10px; 
+            text-shadow: 1px 1px 2px rgba(230,199,122,0.4);
+        }
+
+        #text { 
+            font-size: 15px; 
+            line-height: 1.6; 
+            color: #5A4632; 
+            margin-bottom: 15px;
+            max-height: 18vh;
+            overflow-y: auto;
+            padding-right: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        @media (max-height: 700px) {
+            #text {
+                font-size: 14px;
+                line-height: 1.5;
+                max-height: 15vh;
+            }
+        }
+
+        .next-indicator { 
+            float: right; 
+            padding: 10px 20px; 
+            font-size: 15px; 
+            color: #5A4632; 
+            background: linear-gradient(135deg, #F3E5B5, #E6C77A); 
+            border: 2px solid #E6C77A; 
+            border-radius: 10px; 
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: all 0.2s ease;
+        }
+
+        .next-indicator:active { 
+            transform: scale(0.95);
+        }
+
+        /* ╔════════════════════════════════════════════════════════════════╗ */
+        /* ║                    CONTAINER DE ESCOLHAS                       ║ */
+        /* ╚════════════════════════════════════════════════════════════════╝ */
+        .choice-container { 
+            position: fixed; 
+            bottom: 15px; 
+            left: 5%;
+            right: 5%;
+            width: 90%;
+            display: none; 
+            flex-direction: column; 
+            gap: 12px;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-bottom: 10px;
+            z-index: 200;
+        }
+
+        .choice { 
+            background: rgba(250,246,238,0.98); 
+            border: 3px solid #E6C77A; 
+            border-radius: 15px; 
+            padding: 18px 20px; 
+            font-size: 16px; 
+            line-height: 1.4;
+            color: #5A4632; 
+            cursor: pointer; 
+            text-align: center;
+            touch-action: manipulation;
+            box-shadow: 0 4px 15px rgba(230,199,122,0.3);
+            transition: all 0.2s ease;
+            font-family: 'Georgia', serif;
+            font-weight: normal;
+        }
+
+        .choice:active { 
+            background: linear-gradient(135deg, #F3E5B5, #E6C77A);
+            transform: scale(0.98);
+        }
+
+        /* ╔════════════════════════════════════════════════════════════════╗ */
+        /* ║                    INDICADOR DE ROTA                           ║ */
+        /* ╚════════════════════════════════════════════════════════════════╝ */
+        #route-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(250,246,238,0.95);
+            border: 2px solid #E6C77A;
+            border-radius: 10px;
+            padding: 10px 15px;
             font-size: 14px;
-            line-height: 1.5;
-            max-height: 15vh;
+            color: #5A4632;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 50;
         }
-    }
 
-    .speaker-container {
-        display: none;
-    }
+        #route-indicator.visible {
+            opacity: 1;
+        }
 
-    .text-container {
-        margin: 0;
-        padding: 0;
-    }
+        /* ╔════════════════════════════════════════════════════════════════╗ */
+        /* ║                    NOTIFICAÇÕES (TOAST)                        ║ */
+        /* ╚════════════════════════════════════════════════════════════════╝ */
+        #toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(250,246,238,0.95);
+            color: #5A4632;
+            padding: 12px 25px;
+            border-radius: 10px;
+            border: 2px solid #E6C77A;
+            z-index: 1001;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            font-size: 14px;
+            font-weight: bold;
+        }
 
-    /* ╔════════════════════════════════════════════════════════════════╗ */
-    /* ║                    INDICADOR PRÓXIMO                           ║ */
-    /* ╚════════════════════════════════════════════════════════════════╝ */
-    .next-indicator { 
-        float: right; 
-        padding: 10px 20px; 
-        font-size: 15px; 
-        color: #5A4632; 
-        background: linear-gradient(135deg, #F3E5B5, #E6C77A); 
-        border: 2px solid #E6C77A; 
-        border-radius: 10px; 
-        cursor: pointer;
-        touch-action: manipulation;
-        transition: all 0.2s ease;
-    }
+        #toast.show {
+            opacity: 1;
+        }
 
-    .next-indicator:active { 
-        transform: scale(0.95);
-    }
+        /* ╔════════════════════════════════════════════════════════════════╗ */
+        /* ║                    BOTÕES DE CONTROLE                          ║ */
+        /* ╚════════════════════════════════════════════════════════════════╝ */
+        .game-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
 
-    /* ╔════════════════════════════════════════════════════════════════╗ */
-    /* ║                    CONTAINER DE ESCOLHAS                       ║ */
-    /* ╚════════════════════════════════════════════════════════════════╝ */
-    .choice-container { 
-        position: fixed; 
-        bottom: 15px; 
-        left: 5%;
-        right: 5%;
-        width: 90%;
-        display: none; 
-        flex-direction: column; 
-        gap: 12px;
-        max-height: 60vh;
-        overflow-y: auto;
-        padding-bottom: 10px;
-        z-index: 200;
-    }
+        .game-controls.hidden {
+            display: none;
+        }
 
-    /* Anotação: Botão de escolha individual */
-    .choice { 
-        background: rgba(250,246,238,0.98); 
-        border: 3px solid #E6C77A; 
-        border-radius: 15px; 
-        padding: 18px 20px; 
-        font-size: 16px; 
-        line-height: 1.4;
-        color: #5A4632; 
-        cursor: pointer; 
-        text-align: center;
-        touch-action: manipulation;
-        box-shadow: 0 4px 15px rgba(230,199,122,0.3);
-        transition: all 0.2s ease;
-        font-family: 'Georgia', serif;
-        font-weight: normal;
-    }
+        .control-btn {
+            background: rgba(250,246,238,0.95);
+            border: 2px solid #E6C77A;
+            color: #5A4632;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+        }
 
-    .choice:active { 
-        background: linear-gradient(135deg, #F3E5B5, #E6C77A);
-        transform: scale(0.98);
-    }
+        .control-btn:active {
+            background: linear-gradient(135deg, #F3E5B5, #E6C77A);
+            transform: scale(0.97);
+        }
 
-    /* ╔════════════════════════════════════════════════════════════════╗ */
-    /* ║                    INDICADOR DE ROTA                           ║ */
-    /* ╚════════════════════════════════════════════════════════════════╝ */
-    #route-indicator {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: rgba(250,246,238,0.95);
-        border: 2px solid #E6C77A;
-        border-radius: 10px;
-        padding: 10px 15px;
-        font-size: 14px;
-        color: #5A4632;
-        font-weight: bold;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        z-index: 50;
-    }
-
-    #route-indicator.visible {
-        opacity: 1;
-    }
-
-    /* ╔════════════════════════════════════════════════════════════════╗ */
-    /* ║                    NOTIFICAÇÕES (TOAST)                        ║ */
-    /* ╚════════════════════════════════════════════════════════════════╝ */
-    #toast {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(250,246,238,0.95);
-        color: #5A4632;
-        padding: 12px 25px;
-        border-radius: 10px;
-        border: 2px solid #E6C77A;
-        z-index: 1001;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        pointer-events: none;
-        font-size: 14px;
-        font-weight: bold;
-    }
-
-    #toast.show {
-        opacity: 1;
-    }
-
-    /* ╔════════════════════════════════════════════════════════════════╗ */
-    /* ║                    BOTÕES DE CONTROLE                          ║ */
-    /* ╚════════════════════════════════════════════════════════════════╝ */
-    .game-controls {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        display: flex;
-        gap: 8px;
-        z-index: 100;
-    }
-
-    .game-controls.hidden {
-        display: none;
-    }
-
-    .control-btn {
-        background: rgba(250,246,238,0.95);
-        border: 2px solid #E6C77A;
-        color: #5A4632;
-        padding: 10px 15px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: bold;
-        transition: all 0.2s ease;
-        touch-action: manipulation;
-    }
-
-    .control-btn:active {
-        background: linear-gradient(135deg, #F3E5B5, #E6C77A);
-        transform: scale(0.97);
-    }
-
-    /* ╔════════════════════════════════════════════════════════════════╗ */
-    /* ║                    SCROLLBAR CUSTOMIZADA                       ║ */
-    /* ╚════════════════════════════════════════════════════════════════╝ */
-    ::-webkit-scrollbar { 
-        width: 6px; 
-    }
-    
-    ::-webkit-scrollbar-track { 
-        background: rgba(230,199,122,0.2); 
-    }
-    
-    ::-webkit-scrollbar-thumb { 
-        background: #E6C77A; 
-        border-radius: 3px; 
-    }
-</style>
+        /* ╔════════════════════════════════════════════════════════════════╗ */
+        /* ║                    SCROLLBAR CUSTOMIZADA                       ║ */
+        /* ╚════════════════════════════════════════════════════════════════╝ */
+        ::-webkit-scrollbar { 
+            width: 6px; 
+        }
+        
+        ::-webkit-scrollbar-track { 
+            background: rgba(230,199,122,0.2); 
+        }
+        
+        ::-webkit-scrollbar-thumb { 
+            background: #E6C77A; 
+            border-radius: 3px; 
+        }
+    </style>
 </head>
 <body>
     <audio id="bgm" loop></audio>
@@ -466,48 +436,42 @@
         <div id="bg-layer">
             <img id="bg" alt="Cenário">
         </div>
+        
         <div id="sprite-layer">
             <img id="charImg" alt="Personagem">
         </div>
-        <div id="overlay"></div>
 
-        <div id="ui-layer">
-            <div id="route-indicator">
-                <span id="route"></span>
+        <div id="main-menu">
+            <div class="menu-content">
+                <h1 class="game-title">Second Chance</h1>
+                <p class="subtitle">Ruins of Destiny</p>
+                <input id="playerName" type="text" placeholder="Digite seu nome..." maxlength="20">
+                <br>
+                <button id="startBtn">Começar Aventura</button>
+                <div class="menu-footer">Manu&Sam Studios</div>
             </div>
+        </div>
 
-            <div id="main-menu">
-                <div class="menu-content">
-                    <h1 class="game-title">Second Chance</h1>
-                    <p class="subtitle">Ruins of Destiny</p>
-                    <input id="playerName" type="text" placeholder="Digite seu nome..." maxlength="20">
-                    <br>
-                    <button id="startBtn">Começar Aventura</button>
-                    <div class="menu-footer">Manu&Sam Studios</div>
-                    <span class="menu-ornament-bottom menu-ornament-bottom-left"></span>
-                    <span class="menu-ornament-bottom menu-ornament-bottom-right"></span>
-                </div>
-            </div>
+        <div id="textbox" class="hidden">
+            <span id="speaker"></span>
+            <p id="text"></p>
+            <button class="next-indicator">▼</button>
+        </div>
 
-            <div id="textbox" class="hidden">
-                <div class="speaker-container">
-                    <span id="speaker"></span>
-                </div>
-                <div class="text-container">
-                    <p id="text"></p>
-                </div>
-                <div class="next-indicator">▼</div>
-            </div>
+        <div id="choices" class="choice-container"></div>
 
-            <div id="choices" class="choice-container"></div>
+        <div id="route-indicator">
+            <span id="route"></span>
+        </div>
 
-            <div class="game-controls hidden">
-                <button class="control-btn" onclick="saveGame()">💾 Salvar</button>
-                <button class="control-btn" onclick="loadGame()">📂 Carregar</button>
-            </div>
+        <div class="game-controls hidden">
+            <button class="control-btn" onclick="saveGame()">💾 Salvar</button>
+            <button class="control-btn" onclick="loadGame()">📂 Carregar</button>
         </div>
     </div>
 
+</body>
+</html>
     <script>
         let playerName = "";
         let state = "menu";
